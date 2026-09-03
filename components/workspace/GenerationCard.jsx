@@ -1,13 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, MoreHorizontal, RotateCw, AlertCircle } from "lucide-react";
 
 const STAGGER_MS = 60;
 
+function useImageFetch(url) {
+  const [state, setState] = useState({ status: "loading", objectUrl: null, error: null });
+
+  useEffect(() => {
+    let cancelled = false;
+    let objectUrl = null;
+    setState({ status: "loading", objectUrl: null, error: null });
+
+    fetch(url)
+      .then(async (res) => {
+        if (!res.ok) {
+          let detail = "";
+          try {
+            const body = await res.json();
+            detail = body?.error || "";
+          } catch {}
+          throw new Error(`HTTP ${res.status}${detail ? ` — ${detail}` : ""}`);
+        }
+        const blob = await res.blob();
+        if (cancelled) return;
+        objectUrl = URL.createObjectURL(blob);
+        setState({ status: "loaded", objectUrl, error: null });
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setState({ status: "error", objectUrl: null, error: err.message || "Failed to load" });
+      });
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [url]);
+
+  return state;
+}
+
 export default function GenerationCard({ variation, selected, onSelect, index = 0 }) {
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const [imgError, setImgError] = useState(false);
+  const { status, objectUrl, error } = useImageFetch(variation.imageUrl);
 
   return (
     <button
@@ -21,25 +57,21 @@ export default function GenerationCard({ variation, selected, onSelect, index = 
       ].join(" ")}
       style={{ animationDelay: `${index * STAGGER_MS}ms` }}
     >
-      {!imgError ? (
+      {status !== "error" ? (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={variation.imageUrl}
-            alt={variation.label}
-            loading="lazy"
-            onLoad={() => setImgLoaded(true)}
-            onError={() => setImgError(true)}
-            className={["absolute inset-0 w-full h-full object-cover transition-opacity duration-300", imgLoaded ? "opacity-100" : "opacity-0"].join(" ")}
-          />
-          {!imgLoaded && (
+          {objectUrl && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={objectUrl} alt={variation.label} className="absolute inset-0 w-full h-full object-cover" />
+          )}
+          {status === "loading" && (
             <div className="absolute inset-0 skeleton-shimmer animate-shimmer" aria-hidden="true" />
           )}
         </>
       ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-surface-elevated text-muted">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 p-3 bg-surface-elevated text-muted text-center">
           <AlertCircle className="w-5 h-5" />
           <p className="text-caption">Image failed to load</p>
+          {error && <p className="text-caption text-error break-words">{error}</p>}
         </div>
       )}
 

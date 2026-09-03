@@ -20,7 +20,15 @@ export async function GET(request) {
     const upstream = await fetch(target);
 
     if (!upstream.ok) {
-      return NextResponse.json({ error: `Upstream returned ${upstream.status}` }, { status: 502 });
+      let bodyText = "";
+      try {
+        bodyText = (await upstream.text()).slice(0, 200);
+      } catch {}
+      console.error(`[image-proxy] upstream ${upstream.status}: ${bodyText}`);
+      return NextResponse.json(
+        { error: `Upstream returned ${upstream.status}${bodyText ? ` — ${bodyText}` : ""}` },
+        { status: 502 }
+      );
     }
 
     const contentType = upstream.headers.get("content-type") || "image/jpeg";
@@ -33,6 +41,10 @@ export async function GET(request) {
       },
     });
   } catch (err) {
-    return NextResponse.json({ error: "Image generation failed" }, { status: 502 });
+    console.error("[image-proxy] fetch threw:", err);
+    return NextResponse.json(
+      { error: `Image generation failed — ${err.message || "unknown error"}` },
+      { status: 502 }
+    );
   }
 }
