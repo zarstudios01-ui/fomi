@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Check, MoreHorizontal, RotateCw, AlertCircle } from "lucide-react";
 
 const STAGGER_MS = 60;
@@ -24,14 +23,15 @@ export default function GenerationCard({ variation, selected, onSelect, index = 
     >
       {!imgError ? (
         <>
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={variation.imageUrl}
             alt={variation.label}
-            fill
-            unoptimized
+            referrerPolicy="no-referrer"
+            loading="lazy"
             onLoad={() => setImgLoaded(true)}
             onError={() => setImgError(true)}
-            className={["object-cover transition-opacity duration-300", imgLoaded ? "opacity-100" : "opacity-0"].join(" ")}
+            className={["absolute inset-0 w-full h-full object-cover transition-opacity duration-300", imgLoaded ? "opacity-100" : "opacity-0"].join(" ")}
           />
           {!imgLoaded && (
             <div className="absolute inset-0 skeleton-shimmer animate-shimmer" aria-hidden="true" />
