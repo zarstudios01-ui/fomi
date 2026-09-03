@@ -46,7 +46,7 @@ module.exports = {
         info: "#5DA9FF",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", ...fontFamily.sans],
+        sans: ["Inter", ...fontFamily.sans],
       },
       fontSize: {
         // [fontSize, { lineHeight, fontWeight }] — from the 02 TYPOGRAPHY spec
