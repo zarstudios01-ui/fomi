@@ -5,7 +5,7 @@ export default function NotFound() {
     <div className="min-h-screen flex flex-col items-center justify-center text-center px-6 bg-background">
       <p className="text-display-md text-primary">404</p>
       <p className="text-body-lg text-secondary mt-2 max-w-sm">
-        This page doesn't exist. It may have moved, or the link is wrong.
+        This page doesn&apos;t exist. It may have moved, or the link is wrong.
       </p>
       <Link
         href="/create"
