@@ -7,14 +7,19 @@ import {
   SETTINGS_NAV_ITEM,
 } from "@/lib/constants";
 
-/**
- * Tablet's "compact navigation": all destinations are still one tap
- * away, but labels are dropped in favor of a narrower rail so the
- * workspace keeps most of the width. This is a separate component
- * from Sidebar (not Sidebar with a narrower class) because the
- * interaction is genuinely different — icon + tooltip vs icon + label —
- * matching the brief's "change composition, not size" instruction.
- */
+function renderNavItem(item) {
+  const Icon = item.icon;
+  return (
+    <NavItem
+      key={item.href}
+      href={item.href}
+      label={item.label}
+      icon={<Icon className="w-4 h-4" strokeWidth={2} />}
+      compact
+    />
+  );
+}
+
 export default function CompactSidebar() {
   const allItems = [...CREATE_NAV_ITEMS, ...WORKSPACE_NAV_ITEMS, ...EXPLORE_NAV_ITEMS];
 
@@ -29,13 +34,11 @@ export default function CompactSidebar() {
       </Link>
 
       <nav className="flex-1 flex flex-col gap-1 overflow-y-auto">
-        {allItems.map((item) => (
-          <NavItem key={item.href} {...item} compact />
-        ))}
+        {allItems.map((item) => renderNavItem(item))}
       </nav>
 
       <div className="pt-2 border-t border-border-subtle w-full flex justify-center">
-        <NavItem {...SETTINGS_NAV_ITEM} compact />
+        {renderNavItem(SETTINGS_NAV_ITEM)}
       </div>
     </aside>
   );

@@ -7,17 +7,26 @@ import {
   SETTINGS_NAV_ITEM,
 } from "@/lib/constants";
 
+function renderNavItem(item, extraProps = {}) {
+  const Icon = item.icon;
+  return (
+    <NavItem
+      key={item.href}
+      href={item.href}
+      label={item.label}
+      icon={<Icon className="w-4 h-4 shrink-0" strokeWidth={2} />}
+      {...extraProps}
+    />
+  );
+}
+
 function NavSection({ title, items }) {
   return (
     <div className="mb-5">
       <p className="px-2.5 mb-1.5 text-caption font-medium text-muted tracking-wide">
         {title}
       </p>
-      <div className="flex flex-col gap-0.5">
-        {items.map((item) => (
-          <NavItem key={item.href} {...item} />
-        ))}
-      </div>
+      <div className="flex flex-col gap-0.5">{items.map((item) => renderNavItem(item))}</div>
     </div>
   );
 }
@@ -37,7 +46,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="pt-3 border-t border-border-subtle">
-        <NavItem {...SETTINGS_NAV_ITEM} />
+        {renderNavItem(SETTINGS_NAV_ITEM)}
       </div>
     </aside>
   );

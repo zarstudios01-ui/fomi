@@ -3,12 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-/**
- * @param {boolean} compact - icon-only, used by the tablet CompactSidebar.
- *   `title` provides the accessible name and native tooltip since there's
- *   no visible label to associate via aria-labelledby.
- */
-export default function NavItem({ href, label, icon: Icon, compact = false }) {
+export default function NavItem({ href, label, icon, compact = false }) {
   const pathname = usePathname();
   const active = pathname === href;
 
@@ -26,7 +21,7 @@ export default function NavItem({ href, label, icon: Icon, compact = false }) {
             : "text-secondary hover:bg-surface-elevated hover:text-primary",
         ].join(" ")}
       >
-        <Icon className="w-4 h-4" strokeWidth={2} />
+        {icon}
       </Link>
     );
   }
@@ -42,7 +37,7 @@ export default function NavItem({ href, label, icon: Icon, compact = false }) {
           : "text-secondary hover:bg-surface-elevated hover:text-primary",
       ].join(" ")}
     >
-      <Icon className="w-4 h-4 shrink-0" strokeWidth={2} />
+      {icon}
       <span className="truncate">{label}</span>
     </Link>
   );
