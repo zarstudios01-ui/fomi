@@ -27,7 +27,6 @@ export default function GenerationCard({ variation, selected, onSelect, index = 
           <img
             src={variation.imageUrl}
             alt={variation.label}
-            referrerPolicy="no-referrer"
             loading="lazy"
             onLoad={() => setImgLoaded(true)}
             onError={() => setImgError(true)}
