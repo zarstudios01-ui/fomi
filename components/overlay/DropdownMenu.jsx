@@ -36,6 +36,7 @@ export default function DropdownMenu({ trigger, items = [], align = "left" }) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
+        className="rounded"
       >
         {trigger}
       </button>

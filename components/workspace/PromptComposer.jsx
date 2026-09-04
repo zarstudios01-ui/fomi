@@ -3,32 +3,23 @@
 import { useState } from "react";
 import { Plus, Sparkles, ChevronDown, ImageIcon, X } from "lucide-react";
 import Button from "@/components/ui/Button";
+import DropdownMenu from "@/components/overlay/DropdownMenu";
+import { CREATIVE_DIRECTION_FIELDS } from "@/lib/constants";
 
-/**
- * Covers every Prompt state from the Interaction States sheet:
- *   Empty       → placeholder only, muted border
- *   Focused     → accent border (:focus-within)
- *   Populated   → border steps up from subtle → default once there's text
- *   Reference   → attached-image chip replaces the "Reference" button
- *   Generating  → textarea + controls disabled, button shows a spinner
- *   Disabled    → same as Generating (this composer has no separate
- *                 disabled-without-generating case in the current flow)
- *   Error       → error-colored border + inline message
- */
+const STYLE_FIELD = CREATIVE_DIRECTION_FIELDS.find((f) => f.key === "visualStyle");
+const RATIO_FIELD = CREATIVE_DIRECTION_FIELDS.find((f) => f.key === "aspectRatio");
+
 export default function PromptComposer({
   prompt,
   onPromptChange,
-  aspectRatio,
+  creativeDirection,
+  onDirectionChange,
   onSubmit,
   status,
   error,
 }) {
   const disabled = status === "generating";
   const populated = prompt.trim().length > 0;
-
-  // UI-only demo of the Reference state — no real upload backend wired
-  // in this mock, but the composition (chip replacing the button,
-  // removable) matches the spec sheet's "With Reference" example.
   const [reference, setReference] = useState(null);
 
   const borderClass = error
@@ -36,6 +27,9 @@ export default function PromptComposer({
     : populated
     ? "border-border focus-within:border-accent"
     : "border-border-subtle focus-within:border-accent";
+
+  const chipClass =
+    "inline-flex items-center gap-1.5 h-8 px-3 rounded bg-surface border border-border-subtle text-body-sm text-secondary hover:text-primary transition-colors duration-150 disabled:opacity-50";
 
   return (
     <div className="w-full">
@@ -64,52 +58,40 @@ export default function PromptComposer({
                   <ImageIcon className="w-3 h-3 text-accent" />
                 </span>
                 {reference.name}
-                <button
-                  type="button"
-                  aria-label="Remove reference"
-                  onClick={() => setReference(null)}
-                  disabled={disabled}
-                  className="text-muted hover:text-primary"
-                >
+                <button type="button" aria-label="Remove reference" onClick={() => setReference(null)} disabled={disabled} className="text-muted hover:text-primary">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </span>
             ) : (
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={() => setReference({ name: "reference.jpg" })}
-                className="inline-flex items-center gap-1.5 h-8 px-3 rounded bg-surface border border-border-subtle text-body-sm text-secondary hover:text-primary transition-colors duration-150 disabled:opacity-50"
-              >
+              <button type="button" disabled={disabled} onClick={() => setReference({ name: "reference.jpg" })} className={chipClass}>
                 <Plus className="w-3.5 h-3.5" />
                 Reference
               </button>
             )}
-            <button
-              type="button"
-              disabled={disabled}
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded bg-surface border border-border-subtle text-body-sm text-secondary hover:text-primary transition-colors duration-150 disabled:opacity-50"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              Style
-              <ChevronDown className="w-3.5 h-3.5" />
-            </button>
-            <button
-              type="button"
-              disabled={disabled}
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded bg-surface border border-border-subtle text-body-sm text-secondary hover:text-primary transition-colors duration-150 disabled:opacity-50"
-            >
-              {aspectRatio}
-              <ChevronDown className="w-3.5 h-3.5" />
-            </button>
+
+            <DropdownMenu
+              trigger={
+                <span className={chipClass} aria-disabled={disabled}>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {creativeDirection.visualStyle}
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </span>
+              }
+              items={STYLE_FIELD.options.map((opt) => ({ label: opt, onSelect: () => onDirectionChange("visualStyle", opt) }))}
+            />
+
+            <DropdownMenu
+              trigger={
+                <span className={chipClass} aria-disabled={disabled}>
+                  {creativeDirection.aspectRatio}
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </span>
+              }
+              items={RATIO_FIELD.options.map((opt) => ({ label: opt, onSelect: () => onDirectionChange("aspectRatio", opt) }))}
+            />
           </div>
 
-          <Button
-            variant="primary"
-            loading={disabled}
-            onClick={onSubmit}
-            className="min-w-[96px]"
-          >
+          <Button variant="primary" loading={disabled} onClick={onSubmit} className="min-w-[96px]">
             {disabled ? "Creating..." : "Create →"}
           </Button>
         </div>

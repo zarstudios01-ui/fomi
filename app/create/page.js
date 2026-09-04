@@ -30,9 +30,6 @@ export default function CreatePage() {
   const { showToast } = useToast();
   const previousStatus = useRef(status);
 
-  // Surface generation outcomes as toasts — matches the Feedback States
-  // sheet ("4 variations generated" / error) without coupling the hook
-  // itself to a UI concern.
   useEffect(() => {
     if (previousStatus.current === "generating" && status === "generated") {
       showToast({
@@ -56,7 +53,8 @@ export default function CreatePage() {
           <CreationEmptyState
             prompt={prompt}
             onPromptChange={setPrompt}
-            aspectRatio={creativeDirection.aspectRatio}
+            creativeDirection={creativeDirection}
+            onDirectionChange={updateDirection}
             selectedIntent={selectedIntent}
             onSelectIntent={(id) => {
               setSelectedIntent(id);
@@ -75,16 +73,16 @@ export default function CreatePage() {
               onSelect={setSelectedId}
               error={error}
               onRetry={generate}
+              aspectRatio={creativeDirection.aspectRatio}
             />
 
-            {selectedId && status === "generated" && (
-              <RefinePanel onApply={() => {}} />
-            )}
+            {selectedId && status === "generated" && <RefinePanel onApply={() => {}} />}
 
             <PromptComposer
               prompt={prompt}
               onPromptChange={setPrompt}
-              aspectRatio={creativeDirection.aspectRatio}
+              creativeDirection={creativeDirection}
+              onDirectionChange={updateDirection}
               onSubmit={generate}
               status={status}
               error={null}
@@ -100,7 +98,6 @@ export default function CreatePage() {
         onClose={() => setDirectionDrawerOpen(false)}
       />
 
-      {/* Opens the Creative Direction drawer below the desktop breakpoint */}
       <Button
         variant="secondary"
         icon

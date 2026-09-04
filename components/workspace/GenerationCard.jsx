@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Check, MoreHorizontal, RotateCw, AlertCircle } from "lucide-react";
+import { aspectRatioClass } from "@/lib/aspectRatio";
 
 const STAGGER_MS = 60;
 
@@ -51,7 +52,8 @@ export default function GenerationCard({ variation, selected, onSelect, index = 
       onClick={() => onSelect?.(variation.id)}
       aria-pressed={selected}
       className={[
-        "group relative aspect-video rounded-card overflow-hidden border text-left animate-reveal bg-surface-elevated",
+        "group relative rounded-card overflow-hidden border text-left animate-reveal bg-surface-elevated",
+        aspectRatioClass(variation.aspectRatio),
         "transition-colors duration-150",
         selected ? "border-accent" : "border-border-subtle hover:border-border",
       ].join(" ")}
@@ -98,19 +100,19 @@ export default function GenerationCard({ variation, selected, onSelect, index = 
   );
 }
 
-export function GenerationCardSkeleton({ index = 0 }) {
+export function GenerationCardSkeleton({ index = 0, aspectRatio = "16:9" }) {
   return (
     <div
-      className="aspect-video rounded-card skeleton-shimmer animate-shimmer border border-border-subtle animate-fade-in"
+      className={["rounded-card skeleton-shimmer animate-shimmer border border-border-subtle animate-fade-in", aspectRatioClass(aspectRatio)].join(" ")}
       style={{ animationDelay: `${index * STAGGER_MS}ms` }}
     />
   );
 }
 
-export function GenerationCardError({ onRetry, index = 0 }) {
+export function GenerationCardError({ onRetry, index = 0, aspectRatio = "16:9" }) {
   return (
     <div
-      className="aspect-video rounded-card border border-error/30 bg-error/5 flex flex-col items-center justify-center gap-2 p-4 animate-reveal"
+      className={["rounded-card border border-error/30 bg-error/5 flex flex-col items-center justify-center gap-2 p-4 animate-reveal", aspectRatioClass(aspectRatio)].join(" ")}
       style={{ animationDelay: `${index * STAGGER_MS}ms` }}
     >
       <p className="text-body-sm text-error font-medium">Failed to generate</p>
